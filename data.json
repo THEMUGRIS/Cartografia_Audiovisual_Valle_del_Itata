@@ -1,11 +1,65 @@
-{
-  "titulo": "Viña vieja parra de Sofía",
-  "autor": "Mauricio Romero",
-  "fecha": "2025-08-26",
-  "etiquetas": ["viñedo","parra centenaria","patrimonio","Guarilihue"],
-  "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
-  "audio_url": "https://tu-enlace-audio/parra-sofia.mp3",
-  "video_url": "https://tu-enlace-video/parra-sofia.mp4",
-  "lat": -36.516054,
-  "lng": -72.494792
-}
+[
+  {
+    "titulo": "Viña TresC en Guarilihue",
+    "autor": "Mauricio Romero",
+    "fecha": "2025-08-26",
+    "etiquetas": ["viñedo","vino","Guarilihue"],
+    "descripcion": "Registro audiovisual en Viña TresC, tradición campesina en Guarilihue.",
+    "audio_url": "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Dee_Yan-Key/California_Waves/Dee_Yan-Key_-_03_-_Ocean_Sea_ambient.mp3",
+    "video_url": "https://samplelib.com/lib/preview/mp4/sample-5s.mp4",
+    "lat": -36.705,
+    "lng": -72.471
+  },
+  {
+    "titulo": "Viña vieja parra de Sofía",
+    "autor": "Mauricio Romero",
+    "fecha": "2025-08-26",
+    "etiquetas": ["viñedo","parra centenaria","patrimonio","Guarilihue"],
+    "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
+    "audio_url": "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kevin_MacLeod/Ambient__Calm/kevin_macleod_-_bump_in_the_night.mp3",
+    "video_url": "https://samplelib.com/lib/preview/mp4/sample-5s.mp4",
+    "lat": -36.516054,
+    "lng": -72.494792
+  },
+  {
+    "titulo": "Riego tradicional en Portezuelo",
+    "autor": "Registro comunitario",
+    "fecha": "2025-07-15",
+    "etiquetas": ["agua","paisaje","Portezuelo"],
+    "descripcion": "Flujo de agua en zanja de riego junto a parras antiguas.",
+    "audio_url": "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Scott_Holmes_Music/Calm/Scott_Holmes_Music_-_06_-_Ambient_Calm.mp3",
+    "lat": -36.743,
+    "lng": -72.431
+  },
+  {
+    "titulo": "Poda de invierno en Ránquil",
+    "autor": "Colectivo local",
+    "fecha": "2025-06-28",
+    "etiquetas": ["viñedo","oficio","Ránquil"],
+    "descripcion": "Tijeras, pasos sobre tierra y voces al atardecer durante la poda.",
+    "audio_url": "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Monk_Turner__Fascinoma/Love_Songs_for_Planet_Earth/Monk_Turner__Fascinoma_-_02_-_Green_Nature_Ambience.mp3",
+    "lat": -36.55,
+    "lng": -72.55
+  },
+  {
+    "titulo": "Orilla del río Itata",
+    "autor": "The Mugris",
+    "fecha": "2025-06-01",
+    "etiquetas": ["agua","fauna","Itata"],
+    "descripcion": "Aves al amanecer y corriente del río.",
+    "audio_url": "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Dee_Yan-Key/California_Waves/Dee_Yan-Key_-_03_-_Ocean_Sea_ambient.mp3",
+    "lat": -36.6,
+    "lng": -72.5
+  },
+  {
+    "titulo": "Viña de Gustavo Riffo — Lomas de Llahuén",
+    "autor": "Mauricio Romero",
+    "fecha": "2025-08-26",
+    "etiquetas": ["viñedo","Llahuén","campesino"],
+    "descripcion": "Viña campesina de Gustavo Riffo en las Lomas de Llahuén, Portezuelo.",
+    "audio_url": "https://tu-enlace-audio/riffo.mp3",
+    "video_url": "https://tu-enlace-video/riffo.mp4",
+    "lat": -36.578403,
+    "lng": -72.471458
+  }
+]
