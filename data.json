@@ -5,8 +5,7 @@
     "fecha": "2025-08-26",
     "etiquetas": ["viñedo","parra centenaria","patrimonio","Guarilihue"],
     "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
-    "audio_url": "https://tu-enlace-audio/parra-sofia.mp3",
-    "video_url": "https://tu-enlace-video/parra-sofia.mp4",
+    "video_url": "<iframe width=\"100%\" height=\"200\" src=\"https://www.youtube.com/embed/4eARJCOB4xg\" frameborder=\"0\" allowfullscreen></iframe>",
     "lat": -36.516054,
     "lng": -72.494792
   },
