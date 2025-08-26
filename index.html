@@ -4,11 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cartografía audiovisual de la viñatería rural del Valle del Itata</title>
+
+  <!-- Leaflet + MarkerCluster -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
   <style>
     html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
     #app { display: grid; grid-template-rows: auto 1fr; height: 100%; }
@@ -34,7 +37,7 @@
     .btn:hover { background:#f8fafc; }
     video, audio { outline: none; }
 
-    /* ===== Ajustes para pantallas pequeñas (mobile) ===== */
+    /* ===== Mobile ===== */
     @media (max-width: 768px) {
       .layout { display: block; }
       .panel {
@@ -43,7 +46,7 @@
         border-bottom: 1px solid #e5e7eb;
         padding: 0.8rem;
       }
-      #map { height: 70vh; } /* mapa ocupa 70% de alto en móvil */
+      #map { height: 70vh; }
       header h1 { font-size: 0.9rem; }
     }
   </style>
@@ -72,7 +75,7 @@
 </div>
 
 <script>
-// === Inicializar mapa ===
+// ===== Capas base =====
 const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19, attribution: '&copy; OpenStreetMap'
 });
@@ -85,56 +88,31 @@ const esriSat = L.tileLayer(
   }
 );
 
+// Mapa con satélite por defecto
 const map = L.map('map', { scrollWheelZoom: true, layers: [esriSat] });
 map.setView([-36.7, -72.5], 11);
 
-// Control de capas (switch entre Satélite y OSM)
-const baseMaps = {
-  "Satélite (Esri)": esriSat,
-  "Mapa (OSM)": osm
-};
-L.control.layers(baseMaps).addTo(map);
+// Switch de capas
+L.control.layers({ "Satélite (Esri)": esriSat, "Mapa (OSM)": osm }).addTo(map);
 
-// === Marcadores y lógica ===
+// ===== Marcadores y lógica =====
 const markers = L.markerClusterGroup();
-let layerAll = L.layerGroup().addTo(map);
+const layerAll = L.layerGroup().addTo(map);
 
 let PUNTOS = [];
 let activeTags = new Set();
 
-// 👉 Punto extra: Viña vieja parra de Sofía (además de data.json)
-const extraPuntos = [
-  {
-    "titulo": "Viña vieja parra de Sofía",
-    "autor": "Mauricio Romero",
-    "fecha": "2025-08-26",
-    "etiquetas": ["viñedo","parra centenaria","patrimonio","Guarilihue"],
-    "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
-    "audio_url": "https://tu-enlace-audio/parra-sofia.mp3",
-    "video_url": "https://tu-enlace-video/parra-sofia.mp4",
-    "lat": -36.516054,
-    "lng": -72.494792
-  }
-];
-
-// Carga de datos externa
+// Cargar SOLO desde data.json (no hay puntos extra en el HTML)
 fetch('data.json')
   .then(r => r.json())
   .then(data => {
-    PUNTOS = Array.isArray(data) ? data.slice() : [];
-    // Sumar el punto de Sofía
-    PUNTOS.push(...extraPuntos);
+    PUNTOS = Array.isArray(data) ? data : [];
     buildTagUI();
     render();
   })
-  .catch(err => {
-    console.error("Error cargando data.json, se usarán solo los puntos extra.", err);
-    PUNTOS = extraPuntos.slice();
-    buildTagUI();
-    render();
-  });
+  .catch(err => console.error('Error cargando data.json', err));
 
-// Construir UI de etiquetas únicas
+// UI de etiquetas únicas
 function buildTagUI(){
   const allTags = Array.from(new Set(PUNTOS.flatMap(p => p.etiquetas || []))).sort();
   const tagsDiv = document.getElementById('tags');
@@ -154,8 +132,9 @@ function buildTagUI(){
 
 // Buscar por texto
 const q = document.getElementById('q');
-q.addEventListener('input', () => render());
+q.addEventListener('input', render);
 
+// Bloque de medios
 function mediaBlock(p){
   if (p.video_url) {
     return `
@@ -173,13 +152,14 @@ function mediaBlock(p){
   return `<div class="meta">Sin medio adjunto</div>`;
 }
 
-// Crear marcadores desde datos (según filtros)
+// Pintar marcadores
 function render() {
   markers.clearLayers();
   layerAll.clearLayers();
+
   const text = q.value.trim().toLowerCase();
   const filtered = PUNTOS.filter(p => {
-    const textOk = !text || ( (p.titulo||"") + ' ' + (p.autor||"") + ' ' + (p.descripcion||"") ).toLowerCase().includes(text);
+    const textOk = !text || ((p.titulo||"")+' '+(p.autor||"")+' '+(p.descripcion||"")).toLowerCase().includes(text);
     const tagsOk = activeTags.size === 0 || (p.etiquetas||[]).some(t => activeTags.has(t));
     return textOk && tagsOk;
   });
@@ -205,6 +185,7 @@ function render() {
   }
 }
 
+// Botón “Ajustar vista”
 document.getElementById('fit').onclick = () => {
   const visible = [];
   markers.eachLayer(m => visible.push(m.getLatLng()));
