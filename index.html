@@ -89,15 +89,36 @@ let layerAll = L.layerGroup().addTo(map);
 let PUNTOS = [];
 let activeTags = new Set();
 
+// 👉 Punto extra: Viña vieja parra de Sofía (se agrega además de data.json)
+const extraPuntos = [
+  {
+    "titulo": "Viña vieja parra de Sofía",
+    "autor": "Mauricio Romero",
+    "fecha": "2025-08-26",
+    "etiquetas": ["viñedo","parra centenaria","patrimonio","Guarilihue"],
+    "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
+    "audio_url": "https://tu-enlace-audio/parra-sofia.mp3",
+    "video_url": "https://tu-enlace-video/parra-sofia.mp4",
+    "lat": -36.516054,
+    "lng": -72.494792
+  }
+];
+
 // Carga de datos externa
 fetch('data.json')
   .then(r => r.json())
   .then(data => {
-    PUNTOS = data;
+    PUNTOS = Array.isArray(data) ? data.slice() : [];
+    // Sumar el punto de Sofía
+    PUNTOS.push(...extraPuntos);
     buildTagUI();
     render();
-  }).catch(err => {
-    console.error("Error cargando data.json", err);
+  })
+  .catch(err => {
+    console.error("Error cargando data.json, se usarán solo los puntos extra.", err);
+    PUNTOS = extraPuntos.slice();
+    buildTagUI();
+    render();
   });
 
 // Construir UI de etiquetas únicas
