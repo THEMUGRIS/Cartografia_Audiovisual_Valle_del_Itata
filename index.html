@@ -59,10 +59,14 @@
 </div>
 
 <script>
-const map = L.map('map', { scrollWheelZoom: true });
-const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19, attribution: '&copy; OpenStreetMap'
-}).addTo(map);
+const tiles = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  {
+    maxZoom: 19,
+    attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+  }
+).addTo(map);
+
 
 const markers = L.markerClusterGroup();
 let layerAll = L.layerGroup().addTo(map);
