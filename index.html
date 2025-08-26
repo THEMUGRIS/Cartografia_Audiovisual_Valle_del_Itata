@@ -33,6 +33,19 @@
     .btn { display:inline-block; padding:.4rem .6rem; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; font-size:.85rem; }
     .btn:hover { background:#f8fafc; }
     video, audio { outline: none; }
+
+    /* ===== Ajustes para pantallas pequeñas (mobile) ===== */
+    @media (max-width: 768px) {
+      .layout { display: block; }
+      .panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 0.8rem;
+      }
+      #map { height: 70vh; } /* mapa ocupa 70% de alto en móvil */
+      header h1 { font-size: 0.9rem; }
+    }
   </style>
 </head>
 <body>
@@ -89,7 +102,7 @@ let layerAll = L.layerGroup().addTo(map);
 let PUNTOS = [];
 let activeTags = new Set();
 
-// 👉 Punto extra: Viña vieja parra de Sofía (se agrega además de data.json)
+// 👉 Punto extra: Viña vieja parra de Sofía (además de data.json)
 const extraPuntos = [
   {
     "titulo": "Viña vieja parra de Sofía",
