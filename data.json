@@ -1,42 +1,11 @@
-[
-  {
-    "titulo": "Cosecha manual en Guarilihue",
-    "autor": "Mauricio Romero",
-    "fecha": "2025-08-20",
-    "etiquetas": [
-      "viñedo",
-      "oficio",
-      "personas"
-    ],
-    "descripcion": "Corte de uva y conversación entre viñateros al atardecer.",
-    "audio_url": "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Dee_Yan-Key/California_Waves/Dee_Yan-Key_-_03_-_Ocean_Sea_ambient.mp3",
-    "lat": -36.72,
-    "lng": -72.476
-  },
-  {
-    "titulo": "Zanja de riego en Portezuelo",
-    "autor": "Registro comunitario",
-    "fecha": "2025-07-15",
-    "etiquetas": [
-      "agua",
-      "paisaje"
-    ],
-    "descripcion": "Flujo de agua por riego tradicional junto a parras antiguas.",
-    "video_url": "https://samplelib.com/lib/preview/mp4/sample-5s.mp4",
-    "lat": -36.743,
-    "lng": -72.431
-  },
-  {
-    "titulo": "Orilla del río Itata",
-    "autor": "The Mugris",
-    "fecha": "2025-06-01",
-    "etiquetas": [
-      "agua",
-      "fauna"
-    ],
-    "descripcion": "Aves al amanecer y corriente del río.",
-    "audio_url": "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kevin_MacLeod/Ambient__Calm/kevin_macleod_-_bump_in_the_night.mp3",
-    "lat": -36.6,
-    "lng": -72.5
-  }
-]
+{
+  "titulo": "Viña vieja parra de Sofía",
+  "autor": "Mauricio Romero",
+  "fecha": "2025-08-26",
+  "etiquetas": ["viñedo","parra centenaria","patrimonio","Guarilihue"],
+  "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
+  "audio_url": "https://tu-enlace-audio/parra-sofia.mp3",
+  "video_url": "https://tu-enlace-video/parra-sofia.mp4",
+  "lat": -36.516054,
+  "lng": -72.494792
+}
