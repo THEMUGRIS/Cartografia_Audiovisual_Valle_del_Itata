@@ -3,40 +3,40 @@
     "titulo": "Viña vieja parra de Sofía",
     "autor": "Mauricio Romero",
     "fecha": "2025-08-26",
-    "etiquetas": ["patrimonio", "Guarilihue", "parra centenaria", "viñedo"],
     "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
     "lat": -36.516054,
     "lng": -72.494792,
+    "etiquetas": ["Guarilihue", "viñedo", "parra centenaria", "patrimonio", "vino"],
     "video_url": "https://youtu.be/4eARJCOB4xg"
   },
   {
-    "titulo": "Viña Gustavo Riffo - Lomas de Llahuen",
+    "titulo": "Viña de Gustavo Riffo — Lomas de Llahuén",
     "autor": "Mauricio Romero",
     "fecha": "2025-08-26",
-    "etiquetas": ["Llahuen", "Portezuelo", "campesino", "viñedo"],
-    "descripcion": "Registro audiovisual de la viña de Gustavo Riffo en Lomas de Llahuen.",
+    "descripcion": "Viñedo en Lomas de Llahuén, Portezuelo. Proyecto campesino en el Valle del Itata.",
     "lat": -36.578403,
     "lng": -72.471458,
+    "etiquetas": ["Portezuelo", "Llahuén", "campesino", "vino", "patrimonio"],
     "video_url": "https://youtu.be/Ui0vJCl6lGY"
   },
   {
-    "titulo": "Vinos Mingaco",
+    "titulo": "Vinos Mingaco — Coelemu",
     "autor": "Mauricio Romero",
-    "fecha": "2025-08-27",
-    "etiquetas": ["Coelemu", "vino", "campesino", "colaboración"],
-    "descripcion": "Viña Mingaco en Coelemu. Vinos naturales y colaboración comunitaria.",
-    "lat": -36.57787,
-    "lng": -72.65496,
+    "fecha": "2025-08-26",
+    "descripcion": "Visita y cata en Vinos Mingaco, proyecto de viticultura campesina en Checura, Coelemu.",
+    "lat": -36.577869977092796,
+    "lng": -72.6548491914302,
+    "etiquetas": ["Coelemu", "vino", "enoturismo"],
     "video_url": "https://youtube.com/shorts/at54y-w93OI?feature=share"
   },
   {
     "titulo": "El Rito Ecoagrícola",
     "autor": "Mauricio Romero",
-    "fecha": "2025-08-27",
-    "etiquetas": ["Portezuelo", "vino", "ecológico", "colaboración"],
-    "descripcion": "El Rito Ecoagrícola, prácticas agroecológicas y vino natural en Portezuelo.",
+    "fecha": "2025-08-26",
+    "descripcion": "Proyecto El Rito Ecoagrícola en el Valle del Itata.",
     "lat": -36.580139,
     "lng": -72.652889,
+    "etiquetas": ["ecoagrícola", "campesino", "patrimonio", "vino"],
     "video_url": "https://youtube.com/shorts/yLHAOU1-NDk?feature=share"
   }
 ]
