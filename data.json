@@ -48,5 +48,15 @@
     "lng": -72.67494,
     "etiquetas": ["Guarilihue", "bodega", "vino"],
     "video_url": "https://youtube.com/shorts/IEkSpinHmks?feature=share"
+  },
+  {
+    "titulo": "Vinos La Basilona",
+    "autor": "Mauricio Romero",
+    "fecha": "2025-08-27",
+    "descripcion": "Vinos La Basilona en Guarilihue, Valle del Itata.",
+    "lat": -36.57960,
+    "lng": -72.68514,
+    "etiquetas": ["Guarilihue", "bodega", "vino"],
+    "video_url": "https://youtube.com/shorts/ENJZdu6APF0?feature=share"
   }
 ]
