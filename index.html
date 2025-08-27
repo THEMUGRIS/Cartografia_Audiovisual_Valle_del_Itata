@@ -112,7 +112,7 @@ fetch('data.json')
   })
   .catch(err => console.error('Error cargando data.json', err));
 
-// UI de etiquetas únicas
+// ===== UI etiquetas únicas =====
 function buildTagUI(){
   const allTags = Array.from(new Set(PUNTOS.flatMap(p => p.etiquetas || []))).sort();
   const tagsDiv = document.getElementById('tags');
@@ -130,54 +130,67 @@ function buildTagUI(){
   });
 }
 
-// Buscar por texto
+// ===== Buscar por texto =====
 const q = document.getElementById('q');
 q.addEventListener('input', render);
 
-// ---- Helpers de medios ----
+// ===== Helpers de YouTube =====
 function toYoutubeEmbed(url){
   try {
     const u = new URL(url);
     // youtu.be/<id>
     if (u.hostname.includes('youtu.be')) {
-      const id = u.pathname.replace('/', '');
+      const id = u.pathname.slice(1);
       return `https://www.youtube.com/embed/${id}`;
     }
     // youtube.com/watch?v=<id>
-    if (u.hostname.includes('youtube.com') && u.searchParams.get('v')) {
-      return `https://www.youtube.com/embed/${u.searchParams.get('v')}`;
+    if (u.hostname.includes('youtube.com')) {
+      const v = u.searchParams.get('v');
+      if (v) return `https://www.youtube.com/embed/${v}`;
+      if (u.pathname.includes('/embed/')) return url;
     }
-    return url; // ya podría ser /embed/
+    return url; // no es YouTube o ya viene en /embed/
   } catch { return url; }
 }
 
-// Bloque de medios (YouTube, MP4 o audio)
+// ===== Bloque de medios (YouTube, MP4 o audio) =====
 function mediaBlock(p){
   if (p.video_url) {
-    const v = p.video_url.trim();
-    const isEmbed = v.includes('youtube.com/embed');
-    const isYoutube = v.includes('youtu.be') || v.includes('youtube.com');
-    if (isEmbed || isYoutube) {
-      const src = isEmbed ? v : toYoutubeEmbed(v);
-      return `<iframe width="100%" height="220" src="${src}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    const v = String(p.video_url).trim();
+
+    // Si pegaron un iframe completo en el JSON
+    if (v.startsWith('<iframe')) {
+      return v;
     }
-    // Si es un .mp4 directo
+
+    // Enlaces de YouTube (watch, youtu.be, embed)
+    if (v.includes('youtu.be') || v.includes('youtube.com')) {
+      const src = toYoutubeEmbed(v);
+      return `<iframe width="100%" height="220" src="${src}" frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>`;
+    }
+
+    // Archivo de video directo (.mp4)
     return `
       <video controls preload="metadata" style="width:100%; max-height:260px">
         <source src="${v}" type="video/mp4">
         Tu navegador no soporta video HTML5.
       </video>`;
-  } else if (p.audio_url) {
+  }
+
+  if (p.audio_url) {
     return `
       <audio controls preload="none" style="width:100%">
         <source src="${p.audio_url}" type="audio/mpeg">
         Tu navegador no soporta audio HTML5.
       </audio>`;
   }
+
   return `<div class="meta">Sin medio adjunto</div>`;
 }
 
-// Pintar marcadores
+// ===== Pintar marcadores =====
 function render() {
   markers.clearLayers();
   layerAll.clearLayers();
