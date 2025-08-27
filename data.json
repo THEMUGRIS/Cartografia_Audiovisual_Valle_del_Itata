@@ -7,7 +7,8 @@
     "lat": -36.516054,
     "lng": -72.494792,
     "etiquetas": ["Guarilihue", "viñedo", "parra centenaria", "patrimonio", "vino"],
-    "video_url": "https://www.youtube.com/embed/4eARJCOB4xg"
+    "video_url": "https://www.youtube.com/embed/4eARJCOB4xg",
+    "short": false
   },
   {
     "titulo": "Viña de Gustavo Riffo — Lomas de Llahuén",
@@ -17,7 +18,8 @@
     "lat": -36.578403,
     "lng": -72.471458,
     "etiquetas": ["Portezuelo", "Llahuén", "campesino", "vino", "patrimonio"],
-    "video_url": "https://www.youtube.com/embed/Ui0vJCl6lGY"
+    "video_url": "https://www.youtube.com/embed/Ui0vJCl6lGY",
+    "short": false
   },
   {
     "titulo": "Vinos Mingaco — Coelemu",
@@ -62,5 +64,16 @@
     "etiquetas": ["Guarilihue", "bodega", "vino"],
     "video_url": "https://www.youtube.com/embed/ENJZdu6APF0",
     "short": true
+  },
+  {
+    "titulo": "Viña Raíz Criolla — Bodega y oficina",
+    "autor": "Mauricio Romero",
+    "fecha": "2025-08-27",
+    "descripcion": "Bodega y oficina de Viña Raíz Criolla en Portezuelo, Valle del Itata.",
+    "lat": -36.52770,
+    "lng": -72.42742,
+    "etiquetas": ["Portezuelo", "bodega", "vino"],
+    "video_url": "https://www.youtube.com/embed/gz5q57LZS5U",
+    "short": false
   }
 ]
