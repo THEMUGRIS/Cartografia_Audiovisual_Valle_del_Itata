@@ -138,12 +138,10 @@ q.addEventListener('input', render);
 function toYoutubeEmbed(url){
   try {
     const u = new URL(url);
-    // youtu.be/<id>
     if (u.hostname.includes('youtu.be')) {
       const id = u.pathname.slice(1);
       return `https://www.youtube.com/embed/${id}`;
     }
-    // youtube.com/watch?v=<id>
     if (u.hostname.includes('youtube.com')) {
       const v = u.searchParams.get('v');
       if (v) return `https://www.youtube.com/embed/${v}`;
@@ -161,28 +159,21 @@ function toYoutubeEmbed(url){
 function mediaBlock(p){
   if (p.video_url) {
     const v = String(p.video_url).trim();
-
-    // Caso 1: JSON trae un iframe ya armado
     if (v.startsWith('<iframe')) {
       return v;
     }
-
-    // Caso 2: enlaces de YouTube / Shorts
     if (v.includes('youtu.be') || v.includes('youtube.com')) {
       const src = toYoutubeEmbed(v);
       return `<iframe width="100%" height="220" src="${src}" frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen></iframe>`;
     }
-
-    // Caso 3: archivo de video directo
     return `
       <video controls preload="metadata" style="width:100%; max-height:260px">
         <source src="${v}" type="video/mp4">
         Tu navegador no soporta video HTML5.
       </video>`;
   }
-
   if (p.audio_url) {
     return `
       <audio controls preload="none" style="width:100%">
@@ -190,7 +181,6 @@ function mediaBlock(p){
         Tu navegador no soporta audio HTML5.
       </audio>`;
   }
-
   return `<div class="meta">Sin medio adjunto</div>`;
 }
 
@@ -202,37 +192,4 @@ function render() {
   const text = q.value.trim().toLowerCase();
   const filtered = PUNTOS.filter(p => {
     const textOk = !text || ((p.titulo||"")+' '+(p.autor||"")+' '+(p.descripcion||"")).toLowerCase().includes(text);
-    const tagsOk = activeTags.size === 0 || (p.etiquetas||[]).some(t => activeTags.has(t));
-    return textOk && tagsOk;
-  });
-
-  filtered.forEach(p => {
-    const m = L.marker([p.lat, p.lng]);
-    const popup = `
-      <div class="popup">
-        <h3>${p.titulo||"Sin título"}</h3>
-        <div class="meta">${(p.autor||"Autor desconocido")} · ${(p.fecha||"s/f")} · ${(p.etiquetas||[]).map(t=>\`#\${t}\`).join(' ')}</div>
-        <p>${p.descripcion||""}</p>
-        ${mediaBlock(p)}
-      </div>`;
-    m.bindPopup(popup, { maxWidth: 380 });
-    markers.addLayer(m);
-  });
-
-  layerAll.addLayer(markers);
-
-  if (filtered.length) {
-    const bounds = L.latLngBounds(filtered.map(p => [p.lat, p.lng]));
-    map.fitBounds(bounds.pad(0.2));
-  }
-}
-
-// Botón “Ajustar vista”
-document.getElementById('fit').onclick = () => {
-  const visible = [];
-  markers.eachLayer(m => visible.push(m.getLatLng()));
-  if (visible.length) map.fitBounds(L.latLngBounds(visible).pad(0.2));
-};
-</script>
-</body>
-</html>
+    const tagsOk = activeTags.si
