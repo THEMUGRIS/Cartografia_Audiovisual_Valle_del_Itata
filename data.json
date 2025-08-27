@@ -38,5 +38,15 @@
     "lng": -72.652889,
     "etiquetas": ["ecoagrícola", "campesino", "patrimonio", "vino"],
     "video_url": "https://youtube.com/shorts/yLHAOU1-NDk?feature=share"
+  },
+  {
+    "titulo": "Bodega Vinos Jorge Cotal",
+    "autor": "Mauricio Romero",
+    "fecha": "2025-08-27",
+    "descripcion": "Bodega de vinos en el sector de Guarilihue, Valle del Itata.",
+    "lat": -36.57454,
+    "lng": -72.67494,
+    "etiquetas": ["Guarilihue", "bodega", "vino"],
+    "video_url": "https://youtube.com/shorts/IEkSpinHmks?feature=share"
   }
 ]
