@@ -4,41 +4,56 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cartografía audiovisual de la viñatería rural del Valle del Itata</title>
-
-  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Clúster de marcadores -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-
   <style>
     html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
     #app { display: grid; grid-template-rows: auto 1fr; height: 100%; }
+
     header {
       display: flex; align-items: center; justify-content: space-between;
       padding: .6rem 1rem; border-bottom: 1px solid #e5e7eb; background: #fff; position: sticky; top: 0; z-index: 999;
     }
     header h1 { font-size: 1rem; margin: 0; font-weight: 700; }
     header .meta { font-size: .85rem; color: #64748b; }
+
     .layout { display: grid; grid-template-columns: 300px 1fr; height: 100%; }
     .panel { border-right: 1px solid #e5e7eb; padding: 1rem; overflow: auto; background: #fafafa; }
     .panel h2 { font-size: .95rem; margin: .2rem 0 .6rem 0; }
     .tag { display: inline-block; padding: .2rem .5rem; margin: .15rem; border-radius: 999px; font-size: .8rem; background: #e2e8f0; cursor: pointer; }
     .tag.active { background: #0ea5e9; color: white; }
     .search { width: 100%; padding: .5rem .6rem; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: .8rem; }
+
     #map { width: 100%; height: 100%; }
+
     .popup h3 { margin:.2rem 0 .4rem 0; font-size: 1rem; }
     .popup p  { margin:.2rem 0; font-size: .9rem; }
     .popup .meta { font-size: .8rem; color:#64748b; }
+
     .legend { font-size: .8rem; color: #64748b; margin-top: 1rem; }
     .credits { font-size: .75rem; color:#94a3b8; margin-top: 1.2rem; }
     .btn { display:inline-block; padding:.4rem .6rem; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; font-size:.85rem; }
     .btn:hover { background:#f8fafc; }
-    video, audio { outline: none; }
-    iframe { border: none; }
+    video, audio, iframe { outline: none; }
+
+    /* RESPONSIVE MOBILE */
+    @media (max-width: 768px) {
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+      .panel {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+        height: auto;
+      }
+      #map {
+        height: calc(100vh - 220px); /* mapa ocupa casi toda la pantalla */
+      }
+    }
   </style>
 </head>
 <body>
@@ -82,13 +97,10 @@ const map = L.map('map', { scrollWheelZoom: true, layers: [esriSat] });
 map.setView([-36.7, -72.5], 11);
 
 // Control de capas
-const baseMaps = {
-  "Satélite (Esri)": esriSat,
-  "Mapa (OSM)": osm
-};
+const baseMaps = { "Satélite (Esri)": esriSat, "Mapa (OSM)": osm };
 L.control.layers(baseMaps).addTo(map);
 
-// === Marcadores ===
+// === Marcadores y lógica ===
 const markers = L.markerClusterGroup();
 let layerAll = L.layerGroup().addTo(map);
 
@@ -98,14 +110,9 @@ let activeTags = new Set();
 // Carga de datos externa
 fetch('data.json')
   .then(r => r.json())
-  .then(data => {
-    PUNTOS = data;
-    buildTagUI();
-    render();
-  })
+  .then(data => { PUNTOS = data; buildTagUI(); render(); })
   .catch(err => console.error("Error cargando data.json", err));
 
-// Construir UI de etiquetas
 function buildTagUI(){
   const allTags = Array.from(new Set(PUNTOS.flatMap(p => p.etiquetas || []))).sort();
   const tagsDiv = document.getElementById('tags');
@@ -116,60 +123,42 @@ function buildTagUI(){
     el.textContent = tag;
     el.onclick = () => { 
       if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
-      el.classList.toggle('active');
-      render();
+      el.classList.toggle('active'); render();
     };
     tagsDiv.appendChild(el);
   });
 }
 
-// Buscar por texto
 const q = document.getElementById('q');
 q.addEventListener('input', () => render());
 
-// Bloque multimedia
 function mediaBlock(p){
-  if (p.video_url){
-    if (p.video_url.includes("youtube.com/shorts")){
-      const embed = p.video_url.replace("youtube.com/shorts/", "www.youtube.com/embed/");
-      return `<div style="position:relative;padding-top:177%;overflow:hidden;">
-                <iframe src="${embed}" allowfullscreen
-                  style="position:absolute;top:0;left:0;width:100%;height:100%;">
-                </iframe>
-              </div>`;
-    } else if (p.video_url.includes("youtube.com") || p.video_url.includes("youtu.be")){
-      let embed = p.video_url;
-      if (embed.includes("watch?v=")) embed = embed.replace("watch?v=", "embed/");
-      if (embed.includes("youtu.be")) embed = embed.replace("youtu.be/", "www.youtube.com/embed/");
-      return `<div style="position:relative;padding-top:56.25%;overflow:hidden;">
-                <iframe src="${embed}" allowfullscreen
-                  style="position:absolute;top:0;left:0;width:100%;height:100%;">
-                </iframe>
-              </div>`;
+  if (p.video_url) {
+    // Si es un short de YouTube, insertar como iframe vertical
+    if (p.video_url.includes("youtube.com/shorts/")) {
+      let embed = p.video_url.replace("youtube.com/shorts/", "www.youtube.com/embed/");
+      return `<iframe width="100%" height="480" src="${embed}" frameborder="0" allowfullscreen style="max-height:480px; border-radius:8px;"></iframe>`;
     } else {
-      return `<video controls preload="metadata" style="width:100%;max-height:260px">
-                <source src="${p.video_url}" type="video/mp4">
-                Tu navegador no soporta video HTML5.
-              </video>`;
+      return `<video controls preload="metadata" style="width:100%; max-height:260px">
+        <source src="${p.video_url}" type="video/mp4">
+        Tu navegador no soporta video HTML5.
+      </video>`;
     }
-  } else if (p.audio_url){
+  } else if (p.audio_url) {
     return `<audio controls preload="none" style="width:100%">
-              <source src="${p.audio_url}" type="audio/mpeg">
-              Tu navegador no soporta audio HTML5.
-            </audio>`;
+      <source src="${p.audio_url}" type="audio/mpeg">
+      Tu navegador no soporta audio HTML5.
+    </audio>`;
   }
   return `<div class="meta">Sin medio adjunto</div>`;
 }
 
-// Render
-function render(){
-  markers.clearLayers();
-  layerAll.clearLayers();
-
+function render() {
+  markers.clearLayers(); layerAll.clearLayers();
   const text = q.value.trim().toLowerCase();
   const filtered = PUNTOS.filter(p => {
-    const textOk = !text || ((p.titulo||"") + " " + (p.autor||"") + " " + (p.descripcion||"")).toLowerCase().includes(text);
-    const tagsOk = activeTags.size===0 || (p.etiquetas||[]).some(t => activeTags.has(t));
+    const textOk = !text || ((p.titulo||"") + ' ' + (p.autor||"") + ' ' + (p.descripcion||"")).toLowerCase().includes(text);
+    const tagsOk = activeTags.size === 0 || (p.etiquetas||[]).some(t => activeTags.has(t));
     return textOk && tagsOk;
   });
 
@@ -178,23 +167,22 @@ function render(){
     const popup = `
       <div class="popup">
         <h3>${p.titulo||"Sin título"}</h3>
-        <div class="meta">${(p.autor||"Autor desconocido")} · ${(p.fecha||"s/f")} · ${(p.etiquetas||[]).map(t=>"#"+t).join(" ")}</div>
+        <div class="meta">${(p.autor||"Autor desconocido")} · ${(p.fecha||"s/f")} · ${(p.etiquetas||[]).map(t=>`#${t}`).join(' ')}</div>
         <p>${p.descripcion||""}</p>
         ${mediaBlock(p)}
       </div>`;
-    m.bindPopup(popup, { maxWidth: 420 });
+    m.bindPopup(popup, { maxWidth: 380 });
     markers.addLayer(m);
   });
 
   layerAll.addLayer(markers);
 
-  if (filtered.length){
+  if (filtered.length) {
     const bounds = L.latLngBounds(filtered.map(p => [p.lat, p.lng]));
     map.fitBounds(bounds.pad(0.2));
   }
 }
 
-// Ajustar vista manual
 document.getElementById('fit').onclick = () => {
   const visible = [];
   markers.eachLayer(m => visible.push(m.getLatLng()));
