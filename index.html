@@ -14,20 +14,24 @@
 
   <style>
     html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
-    #app { display: grid; grid-template-rows: auto 1fr; height: 100%; }
+    #app { height: 100vh; display: grid; grid-template-rows: auto 1fr; }
     header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: .6rem 1rem; border-bottom: 1px solid #e5e7eb; background: #fff; position: sticky; top: 0; z-index: 999;
+      padding: .6rem 1rem; border-bottom: 1px solid #e5e7eb; background: #fff;
     }
     header h1 { font-size: 1rem; margin: 0; font-weight: 700; }
     header .meta { font-size: .85rem; color: #64748b; }
-    .layout { display: grid; grid-template-columns: 300px 1fr; height: 100%; }
-    .panel { border-right: 1px solid #e5e7eb; padding: 1rem; overflow: auto; background: #fafafa; }
+
+    .layout { height: calc(100vh - 54px); display: grid; grid-template-columns: 300px 1fr; min-height: 0; }
+    .panel { border-right: 1px solid #e5e7eb; padding: 1rem; overflow: auto; background: #fafafa; min-height: 0; }
     .panel h2 { font-size: .95rem; margin: .2rem 0 .6rem 0; }
     .tag { display: inline-block; padding: .2rem .5rem; margin: .15rem; border-radius: 999px; font-size: .8rem; background: #e2e8f0; cursor: pointer; }
-    .tag.active { background: #0ea5e9; color: white; }
+    .tag.active { background: #0ea5e9; color: #fff; }
     .search { width: 100%; padding: .5rem .6rem; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: .8rem; }
-    #map { width: 100%; height: 100%; }
+
+    main { position: relative; min-height: 0; }
+    #map { position: absolute; inset: 0; }
+
     .popup h3 { margin:.2rem 0 .4rem 0; font-size: 1rem; }
     .popup p  { margin:.2rem 0; font-size: .9rem; }
     .popup .meta { font-size: .8rem; color:#64748b; }
@@ -37,16 +41,11 @@
     .btn:hover { background:#f8fafc; }
     video, audio { outline: none; }
 
-    /* ===== Mobile ===== */
     @media (max-width: 768px) {
-      .layout { display: block; }
-      .panel {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #e5e7eb;
-        padding: 0.8rem;
-      }
-      #map { height: 70vh; }
+      .layout { grid-template-columns: 1fr; height: calc(100vh - 54px); }
+      .panel { border-right: none; border-bottom: 1px solid #e5e7eb; padding: .8rem; }
+      main { height: calc(100vh - 54px - 220px); }
+      #map { position: absolute; inset: 0; }
       header h1 { font-size: 0.9rem; }
     }
   </style>
@@ -57,6 +56,7 @@
     <h1>Cartografía audiovisual de la viñatería rural del Valle del Itata</h1>
     <div class="meta">Puntos con audio y video. Filtra por etiquetas o busca por palabras.</div>
   </header>
+
   <div class="layout">
     <aside class="panel">
       <input id="q" class="search" placeholder="Buscar por título, autor o descripción…" />
@@ -66,53 +66,54 @@
         • Clic en un marcador para abrir el medio (audio/video).<br/>
         • Usa <span class="btn" id="fit">Ajustar vista</span> para encuadrar los puntos visibles.
       </div>
-      <div class="credits">
-        Edita <code>data.json</code> para agregar tus puntos del Itata.
-      </div>
+      <div class="credits">Edita <code>data.json</code> para agregar tus puntos del Itata.</div>
     </aside>
-    <main id="map"></main>
+
+    <main>
+      <div id="map"></div>
+    </main>
   </div>
 </div>
 
 <script>
-// ===== Capas base =====
+/* ===== Capas base ===== */
 const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19, attribution: '&copy; OpenStreetMap'
 });
-
 const esriSat = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  {
-    maxZoom: 19,
-    attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics'
-  }
+  { maxZoom: 19, attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics' }
 );
 
-// Crear el mapa aquí ANTES de addTo()
+/* Crear el mapa */
 const map = L.map('map', { scrollWheelZoom: true, layers: [esriSat] });
 map.setView([-36.7, -72.5], 11);
-
-// Switch de capas
 L.control.layers({ "Satélite (Esri)": esriSat, "Mapa (OSM)": osm }).addTo(map);
 
-// ===== Marcadores y lógica =====
+/* Ajustes de tamaño por si el contenedor cambia */
+function fixSize(){ setTimeout(() => map.invalidateSize(), 150); }
+window.addEventListener('load', fixSize);
+window.addEventListener('resize', fixSize);
+
+/* ===== Marcadores y lógica ===== */
 const markers = L.markerClusterGroup();
 const layerAll = L.layerGroup().addTo(map);
 
 let PUNTOS = [];
 let activeTags = new Set();
 
-// Cargar puntos desde data.json
+/* Cargar puntos */
 fetch('data.json')
   .then(r => r.json())
   .then(data => {
     PUNTOS = Array.isArray(data) ? data : [];
     buildTagUI();
     render();
+    fixSize();
   })
   .catch(err => console.error('Error cargando data.json', err));
 
-// ===== UI etiquetas únicas =====
+/* UI de etiquetas */
 function buildTagUI(){
   const allTags = Array.from(new Set(PUNTOS.flatMap(p => p.etiquetas || []))).sort();
   const tagsDiv = document.getElementById('tags');
@@ -121,7 +122,7 @@ function buildTagUI(){
     const el = document.createElement('span');
     el.className = 'tag';
     el.textContent = tag;
-    el.onclick = () => { 
+    el.onclick = () => {
       if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
       el.classList.toggle('active');
       render();
@@ -130,11 +131,11 @@ function buildTagUI(){
   });
 }
 
-// ===== Buscar por texto =====
+/* Buscar */
 const q = document.getElementById('q');
 q.addEventListener('input', render);
 
-// ===== Helpers de YouTube (incluye Shorts) =====
+/* Helpers YouTube (incluye Shorts) */
 function toYoutubeEmbed(url){
   try {
     const u = new URL(url);
@@ -155,13 +156,11 @@ function toYoutubeEmbed(url){
   } catch { return url; }
 }
 
-// ===== Bloque de medios (YouTube, Shorts, MP4 o audio) =====
+/* Bloque de medios */
 function mediaBlock(p){
   if (p.video_url) {
     const v = String(p.video_url).trim();
-    if (v.startsWith('<iframe')) {
-      return v;
-    }
+    if (v.startsWith('<iframe')) return v; // por si pegaste el iframe
     if (v.includes('youtu.be') || v.includes('youtube.com')) {
       const src = toYoutubeEmbed(v);
       return `<iframe width="100%" height="220" src="${src}" frameborder="0"
@@ -184,7 +183,7 @@ function mediaBlock(p){
   return `<div class="meta">Sin medio adjunto</div>`;
 }
 
-// ===== Pintar marcadores =====
+/* Pintar */
 function render() {
   markers.clearLayers();
   layerAll.clearLayers();
@@ -196,15 +195,17 @@ function render() {
     return textOk && tagsOk;
   });
 
+  // ← prearmamos el texto de etiquetas para evitar backticks dentro de backticks
   filtered.forEach(p => {
+    const tagsText = (p.etiquetas || []).map(t => '#' + t).join(' ');
     const m = L.marker([p.lat, p.lng]);
-    const popup = `
-      <div class="popup">
-        <h3>${p.titulo||"Sin título"}</h3>
-        <div class="meta">${(p.autor||"Autor desconocido")} · ${(p.fecha||"s/f")} · ${(p.etiquetas||[]).map(t=>\`#\${t}\`).join(' ')}</div>
-        <p>${p.descripcion||""}</p>
-        ${mediaBlock(p)}
-      </div>`;
+    const popup =
+      `<div class="popup">
+         <h3>${p.titulo || "Sin título"}</h3>
+         <div class="meta">${(p.autor || "Autor desconocido")} · ${(p.fecha || "s/f")} · ${tagsText}</div>
+         <p>${p.descripcion || ""}</p>
+         ${mediaBlock(p)}
+       </div>`;
     m.bindPopup(popup, { maxWidth: 380 });
     markers.addLayer(m);
   });
@@ -217,7 +218,7 @@ function render() {
   }
 }
 
-// Botón “Ajustar vista”
+/* Botón Ajustar vista */
 document.getElementById('fit').onclick = () => {
   const visible = [];
   markers.eachLayer(m => visible.push(m.getLatLng()));
