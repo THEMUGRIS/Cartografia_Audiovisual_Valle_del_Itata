@@ -134,7 +134,7 @@ function buildTagUI(){
 const q = document.getElementById('q');
 q.addEventListener('input', render);
 
-// ===== Helpers de YouTube =====
+// ===== Helpers de YouTube (incluye Shorts) =====
 function toYoutubeEmbed(url){
   try {
     const u = new URL(url);
@@ -148,22 +148,26 @@ function toYoutubeEmbed(url){
       const v = u.searchParams.get('v');
       if (v) return `https://www.youtube.com/embed/${v}`;
       if (u.pathname.includes('/embed/')) return url;
+      if (u.pathname.includes('/shorts/')) {
+        const id = u.pathname.split('/shorts/')[1].split('?')[0];
+        return `https://www.youtube.com/embed/${id}`;
+      }
     }
-    return url; // no es YouTube o ya viene en /embed/
+    return url;
   } catch { return url; }
 }
 
-// ===== Bloque de medios (YouTube, MP4 o audio) =====
+// ===== Bloque de medios (YouTube, Shorts, MP4 o audio) =====
 function mediaBlock(p){
   if (p.video_url) {
     const v = String(p.video_url).trim();
 
-    // Si pegaron un iframe completo en el JSON
+    // Caso 1: JSON trae un iframe ya armado
     if (v.startsWith('<iframe')) {
       return v;
     }
 
-    // Enlaces de YouTube (watch, youtu.be, embed)
+    // Caso 2: enlaces de YouTube / Shorts
     if (v.includes('youtu.be') || v.includes('youtube.com')) {
       const src = toYoutubeEmbed(v);
       return `<iframe width="100%" height="220" src="${src}" frameborder="0"
@@ -171,7 +175,7 @@ function mediaBlock(p){
               allowfullscreen></iframe>`;
     }
 
-    // Archivo de video directo (.mp4)
+    // Caso 3: archivo de video directo
     return `
       <video controls preload="metadata" style="width:100%; max-height:260px">
         <source src="${v}" type="video/mp4">
@@ -207,7 +211,7 @@ function render() {
     const popup = `
       <div class="popup">
         <h3>${p.titulo||"Sin título"}</h3>
-        <div class="meta">${(p.autor||"Autor desconocido")} · ${(p.fecha||"s/f")} · ${(p.etiquetas||[]).map(t=>`#${t}`).join(' ')}</div>
+        <div class="meta">${(p.autor||"Autor desconocido")} · ${(p.fecha||"s/f")} · ${(p.etiquetas||[]).map(t=>\`#\${t}\`).join(' ')}</div>
         <p>${p.descripcion||""}</p>
         ${mediaBlock(p)}
       </div>`;
