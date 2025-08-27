@@ -34,13 +34,14 @@
     .btn { display:inline-block; padding:.4rem .6rem; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; font-size:.85rem; }
     .btn:hover { background:#f8fafc; }
 
-    /* Contenedores responsive para iframes */
-    .yt-portrait, .yt-landscape { position:relative; width:100%; margin:.6rem auto; max-width:560px; }
+    /* Contenedores responsive */
+    .yt-portrait, .yt-landscape {
+      position:relative; width:100%; margin:.6rem auto; max-width:560px; background:#000; border-radius:8px; overflow:hidden;
+    }
     .yt-portrait::before { content:""; display:block; padding-top:177.78%; } /* 9:16 */
-    .yt-landscape::before { content:""; display:block; padding-top:56.25%; }   /* 16:9 */
-    .yt-portrait iframe, .yt-landscape iframe { position:absolute; inset:0; width:100%; height:100%; border:0; border-radius:8px; }
+    .yt-landscape::before { content:""; display:block; padding-top:56.25%; }  /* 16:9 */
+    .yt-portrait iframe, .yt-landscape iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
 
-    /* Móvil: panel arriba, mapa grande */
     @media (max-width: 768px) {
       .layout { flex-direction:column; }
       .panel { width:100%; max-height:220px; border-right:none; border-bottom:1px solid #e5e7eb; }
@@ -84,27 +85,54 @@ const layerAll = L.layerGroup().addTo(map);
 let PUNTOS = [];
 let activeTags = new Set();
 
-// --- Utilidad: normaliza cualquier URL de YouTube a /embed/ ---
-function toYoutubeEmbed(url){
+/* Normalizador de YouTube */
+function toYoutubeEmbedInfo(url){
   try{
     const u = new URL(url);
-    // youtu.be/ID
-    if (u.hostname.includes('youtu.be')) {
-      const id = u.pathname.slice(1);
-      return { src: 'https://www.youtube.com/embed/'+id, portrait: false };
+    let id = "", isShort = false;
+
+    if (u.hostname.includes("youtu.be")) {
+      id = u.pathname.slice(1);
+    } else if (u.hostname.includes("youtube") && u.pathname.startsWith("/shorts/")) {
+      id = u.pathname.split("/shorts/")[1].split("/")[0];
+      isShort = true;
+    } else if (u.hostname.includes("youtube") && u.pathname === "/watch") {
+      id = u.searchParams.get("v") || "";
+    } else if (u.hostname.includes("youtube") && u.pathname.startsWith("/embed/")) {
+      id = u.pathname.split("/embed/")[1].split("/")[0];
     }
-    // youtube.com/shorts/ID
-    if (u.hostname.includes('youtube.com') && u.pathname.startsWith('/shorts/')) {
-      const id = u.pathname.split('/shorts/')[1].split('/')[0];
-      return { src: 'https://www.youtube.com/embed/'+id, portrait: true };
+
+    if (!id) return null;
+    const base = "https://www.youtube-nocookie.com/embed/" + id;
+    const params = "?rel=0&modestbranding=1&playsinline=1";
+    return { src: base + params, isShortGuess: isShort };
+  }catch(e){ return null; }
+}
+
+function mediaBlock(p){
+  if (p.video_url){
+    const info = toYoutubeEmbedInfo(p.video_url);
+    if (info){
+      const isShort = (p.short === true) || info.isShortGuess === true;
+      const klass = isShort ? 'yt-portrait' : 'yt-landscape';
+      return `
+        <div class="${klass}">
+          <iframe
+            src="${info.src}"
+            title="YouTube video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="origin-when-cross-origin"></iframe>
+        </div>`;
     }
-    // youtube.com/watch?v=ID
-    if (u.hostname.includes('youtube.com')) {
-      const v = u.searchParams.get('v');
-      if (v) return { src: 'https://www.youtube.com/embed/'+v, portrait: false };
-    }
-  }catch(e){}
-  return { src: url, portrait: false };
+  }
+  if (p.audio_url){
+    return `<audio controls preload="none" style="width:100%">
+              <source src="${p.audio_url}" type="audio/mpeg">
+            </audio>`;
+  }
+  return `<div class="meta">Sin medio adjunto</div>`;
 }
 
 // Cargar datos
@@ -113,7 +141,6 @@ fetch('data.json')
   .then(data => { PUNTOS = data; buildTagUI(); render(); })
   .catch(err => console.error('Error cargando data.json', err));
 
-// UI de tags
 function buildTagUI(){
   const all = Array.from(new Set(PUNTOS.flatMap(p => p.etiquetas || []))).sort();
   const div = document.getElementById('tags');
@@ -130,45 +157,10 @@ function buildTagUI(){
 const q = document.getElementById('q');
 q.addEventListener('input', render);
 
-// Bloque multimedia robusto (YouTube + MP4 + audio)
-function mediaBlock(p){
-  if (p.video_url){
-    const { src, portrait } = toYoutubeEmbed(p.video_url);
-    // Si es un link de YouTube, usar iframe (shorts vertical si portrait=true)
-    if (src.includes('youtube.com/embed/')){
-      const klass = portrait ? 'yt-portrait' : 'yt-landscape';
-      return `
-        <div class="${klass}">
-          <iframe
-            src="${src}"
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-            referrerpolicy="strict-origin-when-cross-origin">
-          </iframe>
-        </div>`;
-    }
-    // Si no es YouTube, intentar como MP4
-    return `<video controls preload="metadata" style="width:100%; max-height:320px; border-radius:8px">
-              <source src="${p.video_url}" type="video/mp4">
-              Tu navegador no soporta video HTML5.
-            </video>`;
-  }
-  if (p.audio_url){
-    return `<audio controls preload="none" style="width:100%">
-              <source src="${p.audio_url}" type="audio/mpeg">
-              Tu navegador no soporta audio HTML5.
-            </audio>`;
-  }
-  return `<div class="meta">Sin medio adjunto</div>`;
-}
-
-// Render
 function render(){
-  markers.clearLayers();
-  layerAll.clearLayers();
-
+  markers.clearLayers(); layerAll.clearLayers();
   const text = q.value.trim().toLowerCase();
+
   const filtered = PUNTOS.filter(p => {
     const textOk = !text || ((p.titulo||'')+' '+(p.autor||'')+' '+(p.descripcion||'')).toLowerCase().includes(text);
     const tagsOk = activeTags.size===0 || (p.etiquetas||[]).some(t => activeTags.has(t));
@@ -189,14 +181,12 @@ function render(){
   });
 
   layerAll.addLayer(markers);
-
   if (filtered.length){
     const bounds = L.latLngBounds(filtered.map(p => [p.lat, p.lng]));
     map.fitBounds(bounds.pad(0.2));
   }
 }
 
-// Botón “Ajustar vista”
 document.getElementById('fit').onclick = () => {
   const pts = [];
   markers.eachLayer(m => pts.push(m.getLatLng()));
