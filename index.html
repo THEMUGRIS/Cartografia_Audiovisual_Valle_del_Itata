@@ -29,7 +29,21 @@
     .credits { font-size:.75rem;color:#94a3b8;margin-top:1.2rem; }
     .btn { display:inline-block;padding:.4rem .6rem;border:1px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer;font-size:.85rem; }
     .btn:hover { background:#f8fafc; }
-    @media (max-width:768px){ .layout{grid-template-columns:1fr;height:calc(100vh - 54px);} .panel{border-right:none;border-bottom:1px solid #e5e7eb;padding:.8rem;} main{height:calc(100vh - 54px - 220px);} }
+
+    /* Contenedores para video */
+    .yt-portrait { position: relative; width: 100%; max-width: 360px; margin: .5rem 0; }
+    .yt-portrait::before { content: ""; display: block; padding-top: 177.78%; } /* 9:16 */
+    .yt-portrait iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .yt-landscape { position: relative; width: 100%; max-width: 560px; margin: .5rem 0; }
+    .yt-landscape::before { content:""; display:block; padding-top: 56.25%; } /* 16:9 */
+    .yt-landscape iframe { position: absolute; inset:0; width:100%; height:100%; border:0; }
+
+    @media (max-width:768px){
+      .layout{grid-template-columns:1fr;height:calc(100vh - 54px);}
+      .panel{border-right:none;border-bottom:1px solid #e5e7eb;padding:.8rem;}
+      main{height:calc(100vh - 54px - 220px);}
+    }
   </style>
 </head>
 <body>
@@ -124,20 +138,19 @@ function toYoutubeEmbed(url){
   } catch(e){ return url; }
 }
 
-/* Bloque de medios (Shorts vertical 9:16) */
+/* Bloque de medios con Shorts vertical (9:16) y YouTube normal (16:9) */
 function mediaBlock(p){
   if (p.video_url){
     var v = String(p.video_url).trim();
     if (v.indexOf('youtu') !== -1){
       var src = toYoutubeEmbed(v);
 
-      // Shorts → vertical 9:16
+      // Shorts → contenedor vertical
       if (v.indexOf('/shorts/') !== -1) {
-        return '<iframe width="100%" height="480" style="aspect-ratio:9/16;" src="'+src+'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+        return '<div class="yt-portrait"><iframe src="'+src+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
       }
-
-      // YouTube normal → horizontal 16:9
-      return '<iframe width="100%" height="220" style="aspect-ratio:16/9;" src="'+src+'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+      // YouTube normal → horizontal
+      return '<div class="yt-landscape"><iframe src="'+src+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
     }
     // MP4 local/remoto
     return '<video controls style="width:100%;max-height:260px"><source src="'+v+'" type="video/mp4">Tu navegador no soporta video HTML5.</video>';
@@ -170,7 +183,8 @@ function render(){
       +    mediaBlock(p)
       + '</div>';
 
-    var m = L.marker([p.lat, p.lng]).bindPopup(html, {maxWidth:380});
+    // Popup un poco más ancho para que quepa mejor el Short
+    var m = L.marker([p.lat, p.lng]).bindPopup(html, {maxWidth: 420});
     markers.addLayer(m);
   });
 
