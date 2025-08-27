@@ -3,20 +3,40 @@
     "titulo": "Viña vieja parra de Sofía",
     "autor": "Mauricio Romero",
     "fecha": "2025-08-26",
-    "etiquetas": ["patrimonio","Guarilihue","parra centenaria"],
+    "etiquetas": ["patrimonio","Guarilihue","parra centenaria","viñedo"],
     "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
     "lat": -36.516054,
     "lng": -72.494792,
     "video_url": "https://youtu.be/4eARJCOB4xg"
   },
   {
+    "titulo": "Viña Gustavo Riffo - Lomas de Llahuen",
+    "autor": "Mauricio Romero",
+    "fecha": "2025-08-26",
+    "etiquetas": ["Llahuen","Portezuelo","campesino","viñedo"],
+    "descripcion": "Registro audiovisual de la viña de Gustavo Riffo en Lomas de Llahuen.",
+    "lat": -36.578403,
+    "lng": -72.471458,
+    "video_url": "https://youtu.be/Ui0vJCl6lGY"
+  },
+  {
     "titulo": "Vinos Mingaco",
     "autor": "Mauricio Romero",
     "fecha": "2025-08-27",
-    "etiquetas": ["Coelemu","vino","campesino"],
+    "etiquetas": ["Coelemu","vino","campesino","colaboración"],
     "descripcion": "Viña Mingaco en Coelemu. Vinos naturales y colaboración comunitaria.",
     "lat": -36.57787,
     "lng": -72.65496,
     "video_url": "https://youtube.com/shorts/at54y-w93OI?feature=share"
+  },
+  {
+    "titulo": "El Rito Ecoagrícola",
+    "autor": "Mauricio Romero",
+    "fecha": "2025-08-27",
+    "etiquetas": ["Portezuelo","vino","ecológico","colaboración"],
+    "descripcion": "El Rito Ecoagrícola, prácticas agroecológicas y vino natural en Portezuelo.",
+    "lat": -36.580139,
+    "lng": -72.652889,
+    "video_url": "https://youtube.com/shorts/yLHAOU1-NDk?feature=share"
   }
 ]
