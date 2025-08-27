@@ -4,35 +4,48 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cartografía audiovisual de la viñatería rural del Valle del Itata</title>
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
   <style>
     html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
-    #app { display: grid; grid-template-rows: auto 1fr; height: 100%; }
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: .6rem 1rem; border-bottom: 1px solid #e5e7eb; background: #fff; position: sticky; top: 0; z-index: 999;
-    }
+    #app { height: 100vh; display: grid; grid-template-rows: auto 1fr; }
+    header { display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;border-bottom:1px solid #e5e7eb;background:#fff; }
     header h1 { font-size: 1rem; margin: 0; font-weight: 700; }
-    header .meta { font-size: .85rem; color: #64748b; }
-    .layout { display: grid; grid-template-columns: 300px 1fr; height: 100%; }
-    .panel { border-right: 1px solid #e5e7eb; padding: 1rem; overflow: auto; background: #fafafa; }
-    .panel h2 { font-size: .95rem; margin: .2rem 0 .6rem 0; }
-    .tag { display: inline-block; padding: .2rem .5rem; margin: .15rem; border-radius: 999px; font-size: .8rem; background: #e2e8f0; cursor: pointer; }
-    .tag.active { background: #0ea5e9; color: white; }
-    .search { width: 100%; padding: .5rem .6rem; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: .8rem; }
-    #map { width: 100%; height: 100%; }
-    .popup h3 { margin:.2rem 0 .4rem 0; font-size: 1rem; }
-    .popup p  { margin:.2rem 0; font-size: .9rem; }
-    .popup .meta { font-size: .8rem; color:#64748b; }
-    .legend { font-size: .8rem; color: #64748b; margin-top: 1rem; }
-    .credits { font-size: .75rem; color:#94a3b8; margin-top: 1.2rem; }
+    header .meta { font-size: .85rem; color:#64748b; }
+    .layout { height: calc(100vh - 54px); display: grid; grid-template-columns: 300px 1fr; min-height: 0; }
+    .panel { border-right:1px solid #e5e7eb; padding:1rem; overflow:auto; background:#fafafa; }
+    .tag { display:inline-block; padding:.2rem .5rem; margin:.15rem; border-radius:999px; font-size:.8rem; background:#e2e8f0; cursor:pointer; }
+    .tag.active { background:#0ea5e9; color:#fff; }
+    .search { width:100%; padding:.5rem .6rem; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:.8rem; }
+    #map { position:relative; width:100%; height:100%; }
+    .legend { font-size:.8rem; color:#64748b; margin-top:1rem; }
+    .credits { font-size:.75rem; color:#94a3b8; margin-top:1.2rem; }
     .btn { display:inline-block; padding:.4rem .6rem; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; font-size:.85rem; }
     .btn:hover { background:#f8fafc; }
-    video, audio, iframe { outline: none; }
+
+    /* --- Reproductores responsivos --- */
+    /* Contenedor 9:16 (Shorts) */
+    .yt-portrait { position: relative; width: 100%; max-width: 420px; margin:.6rem auto; }
+    .yt-portrait::before { content:""; display:block; padding-top:177.78%; } /* 9:16 */
+    .yt-portrait iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+
+    /* Contenedor 16:9 (YouTube normal) */
+    .yt-landscape { position: relative; width: 100%; max-width: 560px; margin:.6rem auto; }
+    .yt-landscape::before { content:""; display:block; padding-top:56.25%; }
+    .yt-landscape iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+
+    /* Video MP4 fallback */
+    .mp4 { width:100%; max-height:320px; display:block; margin:.6rem auto; }
+
+    @media (max-width:768px){
+      .layout{ grid-template-columns:1fr; }
+      .panel{ border-right:none; border-bottom:1px solid #e5e7eb; }
+    }
   </style>
 </head>
 <body>
@@ -41,69 +54,123 @@
     <h1>Cartografía audiovisual de la viñatería rural del Valle del Itata</h1>
     <div class="meta">Puntos con audio y video. Filtra por etiquetas o busca por palabras.</div>
   </header>
+
   <div class="layout">
     <aside class="panel">
       <input id="q" class="search" placeholder="Buscar por título, autor o descripción…" />
-      <h2>Filtrar por etiquetas</h2>
+      <h2 style="margin:.2rem 0 .6rem">Filtrar por etiquetas</h2>
       <div id="tags"></div>
       <div class="legend">
         • Clic en un marcador para abrir el medio (audio/video).<br/>
         • Usa <span class="btn" id="fit">Ajustar vista</span> para encuadrar los puntos visibles.
       </div>
-      <div class="credits">
-        Edita <code>data.json</code> para agregar tus puntos del Itata.
-      </div>
+      <div class="credits">Edita <code>data.json</code> para agregar tus puntos del Itata.</div>
     </aside>
-    <main id="map"></main>
+
+    <main><div id="map"></div></main>
   </div>
 </div>
 
 <script>
-// === Inicializar mapa ===
-const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19, attribution: '&copy; OpenStreetMap'
-});
+/* ===== Capas base ===== */
+var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OpenStreetMap'});
+var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom:19, attribution:'Tiles © Esri'});
 
-const esriSat = L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  {
-    maxZoom: 19,
-    attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics'
-  }
-);
+/* Mapa */
+var map = L.map('map', {layers:[esri]}).setView([-36.7,-72.5], 11);
+L.control.layers({"Satélite (Esri)":esri,"Mapa (OSM)":osm}).addTo(map);
 
-const map = L.map('map', { scrollWheelZoom: true, layers: [esriSat] });
-map.setView([-36.7, -72.5], 11);
+/* Estado */
+var markers = L.markerClusterGroup();
+var layerAll = L.layerGroup().addTo(map);
+var PUNTOS = [];
+var activeTags = new Set();
 
-// Control de capas
-const baseMaps = {
-  "Satélite (Esri)": esriSat,
-  "Mapa (OSM)": osm
-};
-L.control.layers(baseMaps).addTo(map);
-
-// === Marcadores y lógica ===
-const markers = L.markerClusterGroup();
-let layerAll = L.layerGroup().addTo(map);
-
-let PUNTOS = [];
-let activeTags = new Set();
-
-// Carga de datos externa
+/* Carga de datos */
 fetch('data.json')
-  .then(r => r.json())
-  .then(data => {
-    PUNTOS = data;
-    buildTagUI();
-    render();
-  }).catch(err => {
-    console.error("Error cargando data.json", err);
+ .then(r => r.json())
+ .then(data => { PUNTOS = Array.isArray(data)?data:[]; buildTagUI(); render(); })
+ .catch(err => console.error('Error cargando data.json', err));
+
+/* UI de etiquetas */
+function buildTagUI(){
+  const tags = Array.from(new Set(PUNTOS.flatMap(p => p.etiquetas || []))).sort();
+  const div = document.getElementById('tags'); div.innerHTML = '';
+  tags.forEach(tag => {
+    const el = document.createElement('span');
+    el.className = 'tag'; el.textContent = tag;
+    el.onclick = () => { activeTags.has(tag) ? activeTags.delete(tag) : activeTags.add(tag); el.classList.toggle('active'); render(); };
+    div.appendChild(el);
+  });
+}
+
+/* Búsqueda */
+const q = document.getElementById('q'); q.addEventListener('input', render);
+
+/* Helpers YouTube */
+function toYoutubeEmbed(url){
+  try{
+    const u = new URL(url);
+    if (u.hostname.includes('youtu.be')) return 'https://www.youtube.com/embed/'+u.pathname.slice(1);
+    if (u.hostname.includes('youtube.com')){
+      if (u.pathname.includes('/shorts/')) return 'https://www.youtube.com/embed/'+u.pathname.split('/shorts/')[1].split('?')[0];
+      const v = u.searchParams.get('v'); if (v) return 'https://www.youtube.com/embed/'+v;
+    }
+    return url;
+  }catch(e){ return url; }
+}
+
+/* Bloque de medios responsive */
+function mediaBlock(p){
+  if (p.video_url){
+    const v = String(p.video_url).trim();
+    if (v.includes('youtu')){
+      const src = toYoutubeEmbed(v);
+      if (v.includes('/shorts/')) return '<div class="yt-portrait"><iframe src="'+src+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+      return '<div class="yt-landscape"><iframe src="'+src+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+    }
+    return '<video class="mp4" controls preload="metadata"><source src="'+v+'" type="video/mp4">Tu navegador no soporta video HTML5.</video>';
+  }
+  if (p.audio_url) return '<audio controls style="width:100%"><source src="'+p.audio_url+'" type="audio/mpeg"></audio>';
+  return '<div class="meta">Sin medio adjunto</div>';
+}
+
+/* Render */
+function render(){
+  markers.clearLayers(); layerAll.clearLayers();
+  const text = q.value.trim().toLowerCase();
+  const filtered = PUNTOS.filter(p => {
+    const textOk = !text || ((p.titulo||'')+' '+(p.autor||'')+' '+(p.descripcion||'')).toLowerCase().includes(text);
+    const tagsOk = activeTags.size===0 || (p.etiquetas||[]).some(t => activeTags.has(t));
+    return textOk && tagsOk;
   });
 
-// Construir UI de etiquetas únicas
-function buildTagUI(){
-  const allTags = Array.from(new Set(PUNTOS.flatMap(p => p.etiquetas || []))).sort();
-  const tagsDiv = document.getElementById('tags');
-  tagsDiv.innerHTML = "";
-  allTags.forEach(tag => {
-    const
+  filtered.forEach(p => {
+    const tagsText = (p.etiquetas||[]).map(t=>'#'+t).join(' ');
+    const html = `
+      <div class="popup">
+        <h3 style="margin:.2rem 0 .4rem">${p.titulo||'Sin título'}</h3>
+        <div class="meta" style="font-size:.8rem;color:#64748b;margin-bottom:.4rem">
+          ${(p.autor||'Autor desconocido')} · ${(p.fecha||'s/f')} · ${tagsText}
+        </div>
+        <p style="margin:.2rem 0 .6rem;font-size:.9rem">${p.descripcion||''}</p>
+        ${mediaBlock(p)}
+      </div>`;
+    const m = L.marker([p.lat, p.lng]).bindPopup(html, {maxWidth: 440});
+    markers.addLayer(m);
+  });
+
+  layerAll.addLayer(markers);
+  if (filtered.length){
+    const b = L.latLngBounds(filtered.map(p => [p.lat, p.lng])); map.fitBounds(b.pad(0.2));
+  }
+}
+
+/* Ajustar vista */
+document.getElementById('fit').onclick = () => {
+  const pts = []; markers.eachLayer(m => pts.push(m.getLatLng()));
+  if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.2));
+};
+</script>
+</body>
+</html>
