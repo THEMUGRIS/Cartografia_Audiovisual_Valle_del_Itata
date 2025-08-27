@@ -6,7 +6,7 @@
     "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
     "lat": -36.516054,
     "lng": -72.494792,
-    "etiquetas": ["Guarilihue", "viñedo", "parra centenaria", "patrimonio", "vino"],
+    "etiquetas": ["Itata", "Guarilihue", "viñedo", "parra centenaria", "patrimonio", "vino"],
     "video_url": "https://youtu.be/4eARJCOB4xg"
   },
   {
@@ -16,7 +16,7 @@
     "descripcion": "Viñedo en Lomas de Llahuén, Portezuelo. Proyecto campesino en el Valle del Itata.",
     "lat": -36.578403,
     "lng": -72.471458,
-    "etiquetas": ["Portezuelo", "Llahuén", "campesino", "vino", "patrimonio"],
+    "etiquetas": ["Itata", "Portezuelo", "Llahuén", "campesino", "vino", "patrimonio"],
     "video_url": "https://youtu.be/Ui0vJCl6lGY"
   },
   {
@@ -26,7 +26,7 @@
     "descripcion": "Visita y cata en Vinos Mingaco, proyecto de viticultura campesina en Checura, Coelemu.",
     "lat": -36.577869977092796,
     "lng": -72.6548491914302,
-    "etiquetas": ["Coelemu", "vino", "enoturismo"],
+    "etiquetas": ["Itata", "Coelemu", "vino", "enoturismo"],
     "video_url": "https://youtube.com/shorts/at54y-w93OI?feature=share"
   },
   {
@@ -36,7 +36,7 @@
     "descripcion": "Proyecto El Rito Ecoagrícola en el Valle del Itata.",
     "lat": -36.580139,
     "lng": -72.652889,
-    "etiquetas": ["ecoagrícola", "campesino", "patrimonio", "vino"],
+    "etiquetas": ["Itata", "ecoagricola", "campesino", "patrimonio", "vino"],
     "video_url": "https://youtube.com/shorts/yLHAOU1-NDk?feature=share"
   },
   {
@@ -46,7 +46,7 @@
     "descripcion": "Bodega de vinos en el sector de Guarilihue, Valle del Itata.",
     "lat": -36.57454,
     "lng": -72.67494,
-    "etiquetas": ["Guarilihue", "bodega", "vino"],
+    "etiquetas": ["Itata", "Guarilihue", "bodega", "vino"],
     "video_url": "https://youtube.com/shorts/IEkSpinHmks?feature=share"
   },
   {
@@ -56,7 +56,7 @@
     "descripcion": "Vinos La Basilona en Guarilihue, Valle del Itata.",
     "lat": -36.57960,
     "lng": -72.68514,
-    "etiquetas": ["Guarilihue", "bodega", "vino"],
+    "etiquetas": ["Itata", "Guarilihue", "bodega", "vino"],
     "video_url": "https://youtube.com/shorts/ENJZdu6APF0?feature=share"
   }
 ]
