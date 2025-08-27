@@ -4,33 +4,37 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cartografía audiovisual de la viñatería rural del Valle del Itata</title>
-
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-
   <style>
     html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
-    #app { height: 100vh; display: grid; grid-template-rows: auto 1fr; }
-    header { display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;border-bottom:1px solid #e5e7eb;background:#fff; }
+    #app { display: grid; grid-template-rows: auto 1fr; height: 100%; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .6rem 1rem; border-bottom: 1px solid #e5e7eb; background: #fff; position: sticky; top: 0; z-index: 999;
+    }
     header h1 { font-size: 1rem; margin: 0; font-weight: 700; }
     header .meta { font-size: .85rem; color: #64748b; }
-    .layout { height: calc(100vh - 54px); display: grid; grid-template-columns: 300px 1fr; min-height: 0; }
-    .panel { border-right: 1px solid #e5e7eb; padding: 1rem; overflow: auto; background: #fafafa; min-height: 0; }
+    .layout { display: grid; grid-template-columns: 300px 1fr; height: 100%; }
+    .panel { border-right: 1px solid #e5e7eb; padding: 1rem; overflow: auto; background: #fafafa; }
     .panel h2 { font-size: .95rem; margin: .2rem 0 .6rem 0; }
-    .tag { display:inline-block;padding:.2rem .5rem;margin:.15rem;border-radius:999px;font-size:.8rem;background:#e2e8f0;cursor:pointer; }
-    .tag.active { background:#0ea5e9;color:#fff; }
-    .search { width:100%;padding:.5rem .6rem;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:.8rem; }
-    main { position: relative; min-height: 0; }
-    #map { position: absolute; inset: 0; }
-    .legend { font-size:.8rem;color:#64748b;margin-top:1rem; }
-    .credits { font-size:.75rem;color:#94a3b8;margin-top:1.2rem; }
-    .btn { display:inline-block;padding:.4rem .6rem;border:1px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer;font-size:.85rem; }
+    .tag { display: inline-block; padding: .2rem .5rem; margin: .15rem; border-radius: 999px; font-size: .8rem; background: #e2e8f0; cursor: pointer; }
+    .tag.active { background: #0ea5e9; color: white; }
+    .search { width: 100%; padding: .5rem .6rem; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: .8rem; }
+    #map { width: 100%; height: 100%; }
+    .popup h3 { margin:.2rem 0 .4rem 0; font-size: 1rem; }
+    .popup p  { margin:.2rem 0; font-size: .9rem; }
+    .popup .meta { font-size: .8rem; color:#64748b; }
+    .legend { font-size: .8rem; color: #64748b; margin-top: 1rem; }
+    .credits { font-size: .75rem; color:#94a3b8; margin-top: 1.2rem; }
+    .btn { display:inline-block; padding:.4rem .6rem; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; font-size:.85rem; }
     .btn:hover { background:#f8fafc; }
+    video, audio { outline: none; }
 
-    /* Contenedores para video */
+    /* 📱 Estilos para videos */
     .yt-portrait { position: relative; width: 100%; max-width: 360px; margin: .5rem 0; }
     .yt-portrait::before { content: ""; display: block; padding-top: 177.78%; } /* 9:16 */
     .yt-portrait iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
@@ -38,12 +42,6 @@
     .yt-landscape { position: relative; width: 100%; max-width: 560px; margin: .5rem 0; }
     .yt-landscape::before { content:""; display:block; padding-top: 56.25%; } /* 16:9 */
     .yt-landscape iframe { position: absolute; inset:0; width:100%; height:100%; border:0; }
-
-    @media (max-width:768px){
-      .layout{grid-template-columns:1fr;height:calc(100vh - 54px);}
-      .panel{border-right:none;border-bottom:1px solid #e5e7eb;padding:.8rem;}
-      main{height:calc(100vh - 54px - 220px);}
-    }
   </style>
 </head>
 <body>
@@ -52,7 +50,6 @@
     <h1>Cartografía audiovisual de la viñatería rural del Valle del Itata</h1>
     <div class="meta">Puntos con audio y video. Filtra por etiquetas o busca por palabras.</div>
   </header>
-
   <div class="layout">
     <aside class="panel">
       <input id="q" class="search" placeholder="Buscar por título, autor o descripción…" />
@@ -62,51 +59,63 @@
         • Clic en un marcador para abrir el medio (audio/video).<br/>
         • Usa <span class="btn" id="fit">Ajustar vista</span> para encuadrar los puntos visibles.
       </div>
-      <div class="credits">Edita <code>data.json</code> para agregar tus puntos del Itata.</div>
+      <div class="credits">
+        Edita <code>data.json</code> para agregar tus puntos del Itata.
+      </div>
     </aside>
-
-    <main><div id="map"></div></main>
+    <main id="map"></main>
   </div>
 </div>
 
 <script>
-/* ===== Capas base ===== */
-var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OpenStreetMap'});
-var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom:19, attribution:'Tiles © Esri'});
+// === Inicializar mapa ===
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19, attribution: '&copy; OpenStreetMap'
+});
 
-/* Mapa */
-var map = L.map('map', {layers:[esri]}).setView([-36.7,-72.5], 11);
-L.control.layers({"Satélite (Esri)":esri,"Mapa (OSM)":osm}).addTo(map);
-function fixSize(){ setTimeout(function(){ map.invalidateSize(); }, 150); }
-window.addEventListener('load', fixSize);
-window.addEventListener('resize', fixSize);
+const esriSat = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  {
+    maxZoom: 19,
+    attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics'
+  }
+);
 
-/* Estado */
-var markers = L.markerClusterGroup();
-var layerAll = L.layerGroup().addTo(map);
-var PUNTOS = [];
-var activeTags = new Set();
+const map = L.map('map', { scrollWheelZoom: true, layers: [esriSat] });
+map.setView([-36.7, -72.5], 11);
 
-/* Carga de datos */
+// Control de capas
+const baseMaps = { "Satélite (Esri)": esriSat, "Mapa (OSM)": osm };
+L.control.layers(baseMaps).addTo(map);
+
+// === Marcadores y lógica ===
+const markers = L.markerClusterGroup();
+let layerAll = L.layerGroup().addTo(map);
+
+let PUNTOS = [];
+let activeTags = new Set();
+
+// Carga de datos externa
 fetch('data.json')
- .then(function(r){ return r.json(); })
- .then(function(data){
-    PUNTOS = Array.isArray(data) ? data : [];
+  .then(r => r.json())
+  .then(data => {
+    PUNTOS = data;
     buildTagUI();
     render();
-    fixSize();
- }).catch(function(err){ console.error('Error cargando data.json', err); });
+  }).catch(err => {
+    console.error("Error cargando data.json", err);
+  });
 
-/* UI de etiquetas */
+// Construir etiquetas
 function buildTagUI(){
-  var all = Array.from(new Set([].concat.apply([], PUNTOS.map(function(p){ return p.etiquetas || []; })))).sort();
-  var tagsDiv = document.getElementById('tags');
-  tagsDiv.innerHTML = '';
-  all.forEach(function(tag){
-    var el = document.createElement('span');
+  const allTags = Array.from(new Set(PUNTOS.flatMap(p => p.etiquetas || []))).sort();
+  const tagsDiv = document.getElementById('tags');
+  tagsDiv.innerHTML = "";
+  allTags.forEach(tag => {
+    const el = document.createElement('span');
     el.className = 'tag';
     el.textContent = tag;
-    el.onclick = function(){
+    el.onclick = () => { 
       if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
       el.classList.toggle('active');
       render();
@@ -115,92 +124,80 @@ function buildTagUI(){
   });
 }
 
-/* Búsqueda */
-var q = document.getElementById('q');
-q.addEventListener('input', render);
+// Buscar
+const q = document.getElementById('q');
+q.addEventListener('input', () => render());
 
-/* Helper YouTube: normal y Shorts */
+// Convertir URL de YouTube → embed
 function toYoutubeEmbed(url){
-  try{
-    var u = new URL(url);
-    if (u.hostname.indexOf('youtu.be') !== -1) {
-      return 'https://www.youtube.com/embed/' + u.pathname.slice(1);
+  try {
+    if (url.includes("shorts/")) {
+      let id = url.split("shorts/")[1].split("?")[0];
+      return "https://www.youtube.com/embed/" + id;
     }
-    if (u.hostname.indexOf('youtube.com') !== -1) {
-      var v = u.searchParams.get('v');
-      if (v) return 'https://www.youtube.com/embed/' + v;
-      if (u.pathname.indexOf('/shorts/') !== -1) {
-        var id = u.pathname.split('/shorts/')[1].split('?')[0];
-        return 'https://www.youtube.com/embed/' + id;
-      }
-    }
+    let id = url.split("v=")[1] || url.split("youtu.be/")[1];
+    if (id) id = id.split("&")[0];
+    return "https://www.youtube.com/embed/" + id;
+  } catch {
     return url;
-  } catch(e){ return url; }
+  }
 }
 
-/* Bloque de medios con Shorts vertical (9:16) y YouTube normal (16:9) */
+// Generar bloque multimedia
 function mediaBlock(p){
   if (p.video_url){
     var v = String(p.video_url).trim();
     if (v.indexOf('youtu') !== -1){
       var src = toYoutubeEmbed(v);
-
-      // Shorts → contenedor vertical
       if (v.indexOf('/shorts/') !== -1) {
-        return '<div class="yt-portrait"><iframe src="'+src+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+        return '<div class="yt-portrait"><iframe src="'+src+'" allowfullscreen></iframe></div>';
       }
-      // YouTube normal → horizontal
-      return '<div class="yt-landscape"><iframe src="'+src+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+      return '<div class="yt-landscape"><iframe src="'+src+'" allowfullscreen></iframe></div>';
     }
-    // MP4 local/remoto
-    return '<video controls style="width:100%;max-height:260px"><source src="'+v+'" type="video/mp4">Tu navegador no soporta video HTML5.</video>';
+    return '<video controls style="width:100%;max-height:260px"><source src="'+v+'" type="video/mp4"></video>';
   }
   if (p.audio_url){
-    return '<audio controls style="width:100%"><source src="'+p.audio_url+'" type="audio/mpeg">Tu navegador no soporta audio HTML5.</audio>';
+    return '<audio controls style="width:100%"><source src="'+p.audio_url+'" type="audio/mpeg"></audio>';
   }
   return '<div class="meta">Sin medio adjunto</div>';
 }
 
-/* Render */
-function render(){
+// Renderizar
+function render() {
   markers.clearLayers();
   layerAll.clearLayers();
-
-  var text = q.value.trim().toLowerCase();
-  var filtered = PUNTOS.filter(function(p){
-    var textOk = !text || ((p.titulo||'')+' '+(p.autor||'')+' '+(p.descripcion||'')).toLowerCase().indexOf(text) !== -1;
-    var tagsOk = activeTags.size === 0 || (p.etiquetas||[]).some(function(t){ return activeTags.has(t); });
+  const text = q.value.trim().toLowerCase();
+  const filtered = PUNTOS.filter(p => {
+    const textOk = !text || ( (p.titulo||"") + ' ' + (p.autor||"") + ' ' + (p.descripcion||"") ).toLowerCase().includes(text);
+    const tagsOk = activeTags.size === 0 || (p.etiquetas||[]).some(t => activeTags.has(t));
     return textOk && tagsOk;
   });
 
-  filtered.forEach(function(p){
-    var tagsText = (p.etiquetas||[]).map(function(t){ return '#'+t; }).join(' ');
-    var html = ''
-      + '<div class="popup">'
-      +   '<h3>' + (p.titulo||'Sin título') + '</h3>'
-      +   '<div class="meta">' + (p.autor||'Autor desconocido') + ' · ' + (p.fecha||'s/f') + ' · ' + tagsText + '</div>'
-      +   '<p>' + (p.descripcion||'') + '</p>'
-      +    mediaBlock(p)
-      + '</div>';
-
-    // Popup un poco más ancho para que quepa mejor el Short
-    var m = L.marker([p.lat, p.lng]).bindPopup(html, {maxWidth: 420});
+  filtered.forEach(p => {
+    const m = L.marker([p.lat, p.lng]);
+    const html = `
+      <div class="popup">
+        <h3>${p.titulo||"Sin título"}</h3>
+        <div class="meta">${(p.autor||"Autor desconocido")} · ${(p.fecha||"s/f")} · ${(p.etiquetas||[]).map(t=>"#"+t).join(' ')}</div>
+        <p>${p.descripcion||""}</p>
+        ${mediaBlock(p)}
+      </div>`;
+    m.bindPopup(html, { maxWidth: 420 });
     markers.addLayer(m);
   });
 
   layerAll.addLayer(markers);
 
-  if (filtered.length){
-    var bounds = L.latLngBounds(filtered.map(function(p){ return [p.lat, p.lng]; }));
+  if (filtered.length) {
+    const bounds = L.latLngBounds(filtered.map(p => [p.lat, p.lng]));
     map.fitBounds(bounds.pad(0.2));
   }
 }
 
-/* Ajustar vista */
-document.getElementById('fit').onclick = function(){
-  var pts = [];
-  markers.eachLayer(function(m){ pts.push(m.getLatLng()); });
-  if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.2));
+document.getElementById('fit').onclick = () => {
+  const visible = [];
+  markers.eachLayer(m => visible.push(m.getLatLng()));
+  if (visible.length) map.fitBounds(L.latLngBounds(visible).pad(0.2));
 };
 </script>
 </body>
