@@ -3,43 +3,20 @@
     "titulo": "Viña vieja parra de Sofía",
     "autor": "Mauricio Romero",
     "fecha": "2025-08-26",
-    "etiquetas": ["viñedo","parra centenaria","patrimonio","Guarilihue"],
+    "etiquetas": ["patrimonio","Guarilihue","parra centenaria"],
     "descripcion": "Registro audiovisual de la parra de Sofía, viña campesina tradicional del Valle del Itata.",
-    "video_url": "https://www.youtube.com/embed/4eARJCOB4xg",
     "lat": -36.516054,
-    "lng": -72.494792
+    "lng": -72.494792,
+    "video_url": "https://youtu.be/4eARJCOB4xg"
   },
   {
-    "titulo": "Viña de Gustavo Riffo — Lomas de Llahuén",
-    "autor": "Mauricio Romero",
-    "fecha": "2025-08-26",
-    "etiquetas": ["viñedo","Llahuén","campesino","Portezuelo"],
-    "descripcion": "Viña campesina de Gustavo Riffo en las Lomas de Llahuén, Portezuelo.",
-    "audio_url": "https://tu-enlace-audio/riffo.mp3",
-    "video_url": "https://www.youtube.com/embed/Ui0vJCl6lGY",
-    "lat": -36.578403,
-    "lng": -72.471458
-  },
-  {
-    "titulo": "Vinos Mingaco — Coelemu",
-    "autor": "Mauricio Romero",
-    "fecha": "2025-08-26",
-    "etiquetas": ["vino","Coelemu","enoturismo"],
-    "descripcion": "Visita y cata en Vinos Mingaco, proyecto de viticultura campesina en Checura, Coelemu.",
-    "audio_url": "https://tu-enlace-audio/mingaco.mp3",
-    "video_url": "https://www.youtube.com/embed/at54y-w93OI",
-    "lat": -36.577869977092796,
-    "lng": -72.6548491914302
-  },
-  {
-    "titulo": "El Rito Ecoagroícola",
+    "titulo": "Vinos Mingaco",
     "autor": "Mauricio Romero",
     "fecha": "2025-08-27",
-    "etiquetas": ["ecoagricola","sustentabilidad","Itata"],
-    "descripcion": "Proyecto El Rito Ecoagroícola, agricultura ecológica y viticultura sustentable en el Valle del Itata.",
-    "audio_url": "https://tu-enlace-audio/elrito.mp3",
-    "video_url": "https://www.youtube.com/embed/yLHAOU1-NDk",
-    "lat": -36.580139,
-    "lng": -72.652889
+    "etiquetas": ["Coelemu","vino","campesino"],
+    "descripcion": "Viña Mingaco en Coelemu. Vinos naturales y colaboración comunitaria.",
+    "lat": -36.57787,
+    "lng": -72.65496,
+    "video_url": "https://youtube.com/shorts/at54y-w93OI?feature=share"
   }
 ]
