@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>Cartografía audiovisual de la viñatería rural del Valle del Itata</title>
 
+  <!-- Leaflet + MarkerCluster -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
@@ -34,7 +35,7 @@
     .btn { display:inline-block; padding:.4rem .6rem; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; font-size:.85rem; }
     .btn:hover { background:#f8fafc; }
 
-    /* Contenedores responsive */
+    /* Contenedores responsive para video */
     .yt-portrait, .yt-landscape {
       position:relative; width:100%; margin:.6rem auto; max-width:560px; background:#000; border-radius:8px; overflow:hidden;
     }
@@ -42,6 +43,7 @@
     .yt-landscape::before { content:""; display:block; padding-top:56.25%; }  /* 16:9 */
     .yt-portrait iframe, .yt-landscape iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
 
+    /* Móvil: panel arriba, mapa grande */
     @media (max-width: 768px) {
       .layout { flex-direction:column; }
       .panel { width:100%; max-height:220px; border-right:none; border-bottom:1px solid #e5e7eb; }
@@ -72,7 +74,7 @@
 </div>
 
 <script>
-// Capas
+// Capas base
 const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'&copy; OpenStreetMap' });
 const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19, attribution:'Tiles © Esri, Maxar, Earthstar Geographics' });
 
@@ -85,7 +87,7 @@ const layerAll = L.layerGroup().addTo(map);
 let PUNTOS = [];
 let activeTags = new Set();
 
-/* Normalizador de YouTube */
+/* Normalizador de URLs de YouTube -> dominio nocookie + detección de shorts */
 function toYoutubeEmbedInfo(url){
   try{
     const u = new URL(url);
@@ -101,19 +103,21 @@ function toYoutubeEmbedInfo(url){
     } else if (u.hostname.includes("youtube") && u.pathname.startsWith("/embed/")) {
       id = u.pathname.split("/embed/")[1].split("/")[0];
     }
-
     if (!id) return null;
+
     const base = "https://www.youtube-nocookie.com/embed/" + id;
     const params = "?rel=0&modestbranding=1&playsinline=1";
     return { src: base + params, isShortGuess: isShort };
   }catch(e){ return null; }
 }
 
+/* Render de bloque multimedia: soporta YouTube (short/landscape) + audio/mp4 */
 function mediaBlock(p){
   if (p.video_url){
     const info = toYoutubeEmbedInfo(p.video_url);
     if (info){
-      const isShort = (p.short === true) || info.isShortGuess === true;
+      // Regla: si JSON trae "short": true, forzamos 9:16 aunque sea /embed/
+      const isShort = (p.short === true) || (info.isShortGuess === true);
       const klass = isShort ? 'yt-portrait' : 'yt-landscape';
       return `
         <div class="${klass}">
@@ -126,10 +130,16 @@ function mediaBlock(p){
             referrerpolicy="origin-when-cross-origin"></iframe>
         </div>`;
     }
+    // Fallback: si no es YouTube, intenta como MP4
+    return `<video controls preload="metadata" style="width:100%; max-height:320px; border-radius:8px">
+              <source src="${p.video_url}" type="video/mp4">
+              Tu navegador no soporta video HTML5.
+            </video>`;
   }
   if (p.audio_url){
     return `<audio controls preload="none" style="width:100%">
               <source src="${p.audio_url}" type="audio/mpeg">
+              Tu navegador no soporta audio HTML5.
             </audio>`;
   }
   return `<div class="meta">Sin medio adjunto</div>`;
@@ -141,6 +151,7 @@ fetch('data.json')
   .then(data => { PUNTOS = data; buildTagUI(); render(); })
   .catch(err => console.error('Error cargando data.json', err));
 
+// UI de etiquetas
 function buildTagUI(){
   const all = Array.from(new Set(PUNTOS.flatMap(p => p.etiquetas || []))).sort();
   const div = document.getElementById('tags');
@@ -157,10 +168,12 @@ function buildTagUI(){
 const q = document.getElementById('q');
 q.addEventListener('input', render);
 
+// Pintar marcadores
 function render(){
-  markers.clearLayers(); layerAll.clearLayers();
-  const text = q.value.trim().toLowerCase();
+  markers.clearLayers();
+  layerAll.clearLayers();
 
+  const text = q.value.trim().toLowerCase();
   const filtered = PUNTOS.filter(p => {
     const textOk = !text || ((p.titulo||'')+' '+(p.autor||'')+' '+(p.descripcion||'')).toLowerCase().includes(text);
     const tagsOk = activeTags.size===0 || (p.etiquetas||[]).some(t => activeTags.has(t));
@@ -181,12 +194,14 @@ function render(){
   });
 
   layerAll.addLayer(markers);
+
   if (filtered.length){
     const bounds = L.latLngBounds(filtered.map(p => [p.lat, p.lng]));
     map.fitBounds(bounds.pad(0.2));
   }
 }
 
+// Botón “Ajustar vista”
 document.getElementById('fit').onclick = () => {
   const pts = [];
   markers.eachLayer(m => pts.push(m.getLatLng()));
